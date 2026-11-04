@@ -23,20 +23,30 @@
                 
                 <div class="clock-layout">
                     <svg class="clock-svg" viewBox="0 0 200 200">
+                        <!-- Outer rings -->
                         <circle cx="100" cy="100" r="98" fill="none" stroke="var(--border)" stroke-width="2"/>
-                        <circle cx="100" cy="100" r="90" fill="var(--surface)" stroke="var(--border)" stroke-width="1"/>
+                        <circle cx="100" cy="100" r="92" fill="var(--surface)" stroke="var(--border)" stroke-width="1"/>
+                        
+                        <!-- Generated Ticks (drawn dynamically) -->
                         <g id="localTicks"></g>
+                        
+                        <!-- Numbers (positioned precisely) -->
                         <g class="clock-numbers">
-                            <text x="100" y="35">12</text><text x="155" y="55">1</text>
-                            <text x="175" y="100">3</text><text x="155" y="145">5</text>
-                            <text x="100" y="165">6</text><text x="45" y="145">7</text>
-                            <text x="25" y="100">9</text><text x="45" y="55">11</text>
+                            <text x="100" y="32">12</text><text x="156" y="48">1</text>
+                            <text x="172" y="100">3</text><text x="156" y="152">5</text>
+                            <text x="100" y="172">6</text><text x="44" y="152">7</text>
+                            <text x="28" y="100">9</text><text x="44" y="48">11</text>
                         </g>
-                        <line id="localHour" class="hand-hour" x1="100" y1="100" x2="100" y2="60" transform="rotate(0 100 100)"/>
-                        <line id="localMinute" class="hand-minute" x1="100" y1="100" x2="100" y2="40" transform="rotate(0 100 100)"/>
-                        <line id="localSecond" class="hand-second" x1="100" y1="105" x2="100" y2="30" transform="rotate(0 100 100)"/>
-                        <circle cx="100" cy="100" r="5" fill="var(--primary)"/>
+                        
+                        <!-- Hands -->
+                        <line id="localHour" class="hand-hour" x1="100" y1="100" x2="100" y2="55" transform="rotate(0 100 100)"/>
+                        <line id="localMinute" class="hand-minute" x1="100" y1="100" x2="100" y2="35" transform="rotate(0 100 100)"/>
+                        <line id="localSecond" class="hand-second" x1="100" y1="105" x2="100" y2="25" transform="rotate(0 100 100)"/>
+                        <circle cx="100" cy="100" r="6" fill="var(--primary)"/>
                     </svg>
+                    
+                    <!-- New Date Display -->
+                    <div class="date-display" id="localDateDisplay">Loading date...</div>
                     <div class="digital-time" id="localDigital">--:--:--</div>
                 </div>
             </div>
@@ -47,7 +57,7 @@
             <h3>🌍 Time Anywhere</h3>
             <div class="input-group">
                 <label>Search City or Timezone</label>
-                <input type="text" id="searchCity" placeholder="e.g., Asaba, Bali, London..." autocomplete="off">
+                <input type="text" id="searchCity" placeholder="e.g., Tokyo, London..." autocomplete="off">
                 <div id="searchDropdown" class="autocomplete-list"></div>
             </div>
             <div id="timeResult" class="result-box" style="display:none;">
@@ -56,18 +66,25 @@
                 <div class="clock-layout">
                     <svg class="clock-svg" viewBox="0 0 200 200">
                         <circle cx="100" cy="100" r="98" fill="none" stroke="var(--border)" stroke-width="2"/>
-                        <circle cx="100" cy="100" r="90" fill="var(--surface)" stroke="var(--border)" stroke-width="1"/>
+                        <circle cx="100" cy="100" r="92" fill="var(--surface)" stroke="var(--border)" stroke-width="1"/>
+                        
                         <g id="globalTicks"></g>
+                        
                         <g class="clock-numbers">
-                            <text x="100" y="35">12</text><text x="155" y="55">1</text>
-                            <text x="175" y="100">3</text><text x="155" y="145">5</text>
-                            <text x="100" y="165">6</text><text x="45" y="145">7</text><text x="25" y="100">9</text><text x="45" y="55">11</text>
+                            <text x="100" y="32">12</text><text x="156" y="48">1</text>
+                            <text x="172" y="100">3</text><text x="156" y="152">5</text>
+                            <text x="100" y="172">6</text><text x="44" y="152">7</text>
+                            <text x="28" y="100">9</text><text x="44" y="48">11</text>
                         </g>
-                        <line id="globalHour" class="hand-hour" x1="100" y1="100" x2="100" y2="60" transform="rotate(0 100 100)"/>
-                        <line id="globalMinute" class="hand-minute" x1="100" y1="100" x2="100" y2="40" transform="rotate(0 100 100)"/>
-                        <line id="globalSecond" class="hand-second" x1="100" y1="105" x2="100" y2="30" transform="rotate(0 100 100)"/>
-                        <circle cx="100" cy="100" r="5" fill="var(--primary)"/>
+                        
+                        <line id="globalHour" class="hand-hour" x1="100" y1="100" x2="100" y2="55" transform="rotate(0 100 100)"/>
+                        <line id="globalMinute" class="hand-minute" x1="100" y1="100" x2="100" y2="35" transform="rotate(0 100 100)"/>
+                        <line id="globalSecond" class="hand-second" x1="100" y1="105" x2="100" y2="25" transform="rotate(0 100 100)"/>
+                        <circle cx="100" cy="100" r="6" fill="var(--primary)"/>
                     </svg>
+                    
+                    <!-- New Date Display -->
+                    <div class="date-display" id="globalDateDisplay">Loading date...</div>
                     <div class="digital-time" id="globalDigital">--:--:--</div>
                 </div>
             </div>
@@ -123,23 +140,47 @@
 
             <hr class="divider">
             
-            <!-- Cascading Region Selection -->
-            <div class="grid-3">
-                <div class="input-group">
+            <!-- NEW: Where were you born? -->
+            <h4 style="margin-bottom: 12px; font-weight: 500; color: var(--text-muted);">Where were you born? (Starting Timezone)</h4>
+            <div class="grid-3" style="margin-bottom: 24px;">
+                <div class="input-group" style="margin:0;">
                     <label>Continent</label>
-                    <select id="selContinent">
-                        <option value="">Loading continents...</option>
+                    <select id="birthContinent">
+                        <option value="">Loading...</option>
                     </select>
                 </div>
-                <div class="input-group">
+                <div class="input-group" style="margin:0;">
                     <label>Country</label>
-                    <select id="selCountry" disabled>
+                    <select id="birthCountry" disabled>
                         <option value="">Select Country...</option>
                     </select>
                 </div>
-                <div class="input-group">
+                <div class="input-group" style="margin:0;">
                     <label>State / Province</label>
-                    <select id="selState" disabled>
+                    <select id="birthState" disabled>
+                        <option value="">Select State...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Target Destination -->
+            <h4 style="margin-bottom: 12px; font-weight: 500; color: var(--text-muted);">Translate Time To:</h4>
+            <div class="grid-3">
+                <div class="input-group" style="margin:0;">
+                    <label>Continent</label>
+                    <select id="targetContinent">
+                        <option value="">Loading...</option>
+                    </select>
+                </div>
+                <div class="input-group" style="margin:0;">
+                    <label>Country</label>
+                    <select id="targetCountry" disabled>
+                        <option value="">Select Country...</option>
+                    </select>
+                </div>
+                <div class="input-group" style="margin:0;">
+                    <label>State / Province</label>
+                    <select id="targetState" disabled>
                         <option value="">Select State...</option>
                     </select>
                 </div>
