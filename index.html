@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Time & Date Engine</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="dashboard">
+        
+        <header class="card full-width header">
+            <h2>Global Time & Date Engine</h2>
+            <p>Accurate DST-aware time zones, date math, and birth time translation.</p>
+        </header>
+
+        <!-- Section 1: My Local Time -->
+        <section class="card">
+            <h3>📍 My Local Time</h3>
+            <div class="result-box" style="display:block;">
+                <div class="clock-label" id="localLabel">Detecting...</div>
+                
+                <div class="clock-layout">
+                    <svg class="clock-svg" viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="98" fill="none" stroke="var(--border)" stroke-width="2"/>
+                        <circle cx="100" cy="100" r="90" fill="var(--surface)" stroke="var(--border)" stroke-width="1"/>
+                        <g id="localTicks"></g>
+                        <g class="clock-numbers">
+                            <text x="100" y="35">12</text><text x="155" y="55">1</text>
+                            <text x="175" y="100">3</text><text x="155" y="145">5</text>
+                            <text x="100" y="165">6</text><text x="45" y="145">7</text>
+                            <text x="25" y="100">9</text><text x="45" y="55">11</text>
+                        </g>
+                        <line id="localHour" class="hand-hour" x1="100" y1="100" x2="100" y2="60" transform="rotate(0 100 100)"/>
+                        <line id="localMinute" class="hand-minute" x1="100" y1="100" x2="100" y2="40" transform="rotate(0 100 100)"/>
+                        <line id="localSecond" class="hand-second" x1="100" y1="105" x2="100" y2="30" transform="rotate(0 100 100)"/>
+                        <circle cx="100" cy="100" r="5" fill="var(--primary)"/>
+                    </svg>
+                    <div class="digital-time" id="localDigital">--:--:--</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Global Time Search -->
+        <section class="card">
+            <h3>🌍 Time Anywhere</h3>
+            <div class="input-group">
+                <label>Search City or Timezone</label>
+                <input type="text" id="searchCity" placeholder="e.g., Asaba, Bali, London..." autocomplete="off">
+                <div id="searchDropdown" class="autocomplete-list"></div>
+            </div>
+            <div id="timeResult" class="result-box" style="display:none;">
+                <div class="clock-label" id="clockLabel"></div>
+                
+                <div class="clock-layout">
+                    <svg class="clock-svg" viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="98" fill="none" stroke="var(--border)" stroke-width="2"/>
+                        <circle cx="100" cy="100" r="90" fill="var(--surface)" stroke="var(--border)" stroke-width="1"/>
+                        <g id="globalTicks"></g>
+                        <g class="clock-numbers">
+                            <text x="100" y="35">12</text><text x="155" y="55">1</text>
+                            <text x="175" y="100">3</text><text x="155" y="145">5</text>
+                            <text x="100" y="165">6</text><text x="45" y="145">7</text><text x="25" y="100">9</text><text x="45" y="55">11</text>
+                        </g>
+                        <line id="globalHour" class="hand-hour" x1="100" y1="100" x2="100" y2="60" transform="rotate(0 100 100)"/>
+                        <line id="globalMinute" class="hand-minute" x1="100" y1="100" x2="100" y2="40" transform="rotate(0 100 100)"/>
+                        <line id="globalSecond" class="hand-second" x1="100" y1="105" x2="100" y2="30" transform="rotate(0 100 100)"/>
+                        <circle cx="100" cy="100" r="5" fill="var(--primary)"/>
+                    </svg>
+                    <div class="digital-time" id="globalDigital">--:--:--</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Date Calculator -->
+        <section class="card full-width">
+            <h3>📅 Date Difference</h3>
+            <div class="grid-2">
+                <div class="input-group">
+                    <label>Start Date</label>
+                    <input type="date" id="startDate">
+                </div>
+                <div class="input-group">
+                    <label>End Date</label>
+                    <input type="date" id="endDate">
+                </div>
+            </div>
+            <button id="calcDateBtn">Calculate Difference</button>
+            <div id="diffResult" class="result-box" style="display:none;"></div>
+        </section>
+
+        <!-- Section 4: Birth Time Converter -->
+        <section class="card full-width">
+            <h3>👶 Birth Time Translator</h3>
+            <p class="description">Find out what the time was in another country at the exact moment you were born.</p>
+            
+            <div class="grid-2">
+                <div class="input-group">
+                    <label>Date of Birth</label>
+                    <input type="date" id="dobDate">
+                </div>
+                <div class="input-group">
+                    <label>Time of Birth</label>
+                    <input type="time" id="dobTime">
+                </div>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="unknownTime">
+                <label for="unknownTime">I don't know my exact time of birth</label>
+            </div>
+
+            <div class="input-group" id="timeOfDayGroup" style="display: none;">
+                <label>Approximate Time of Day</label>
+                <select id="timeOfDay">
+                    <option value="09:00">Morning (9:00 AM)</option>
+                    <option value="15:00">Afternoon (3:00 PM)</option>
+                    <option value="19:00">Evening (7:00 PM)</option>
+                    <option value="00:00">Night (12:00 AM)</option>
+                </select>
+            </div>
+
+            <hr class="divider">
+            
+            <!-- Cascading Region Selection -->
+            <div class="grid-3">
+                <div class="input-group">
+                    <label>Continent</label>
+                    <select id="selContinent">
+                        <option value="">Loading continents...</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Country</label>
+                    <select id="selCountry" disabled>
+                        <option value="">Select Country...</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>State / Province</label>
+                    <select id="selState" disabled>
+                        <option value="">Select State...</option>
+                    </select>
+                </div>
+            </div>
+
+            <button id="translateBtn">Translate Birth Time</button>
+            <div id="birthResult" class="result-box" style="display:none;"></div>
+        </section>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
