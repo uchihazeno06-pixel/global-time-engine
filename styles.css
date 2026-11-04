@@ -130,13 +130,20 @@ button:hover { background: var(--primary-hover); }
 .clock-layout { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px 0; }
 .date-display { font-size: 0.95rem; font-weight: 500; color: var(--text-muted); letter-spacing: 0.5px; }
 .digital-time { font-size: 1.75rem; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; letter-spacing: 1px; }
-.clock-svg { width: 100%; max-width: 220px; height: auto; }
+.clock-svg { width: 100%; max-width: 240px; height: auto; }
 
-/* Clock SVG Elements */
-.clock-numbers text { fill: var(--text); font-size: 14px; font-family: sans-serif; font-weight: 600; text-anchor: middle; dominant-baseline: central; }
-.hand-hour { stroke: var(--text); stroke-width: 6; stroke-linecap: round; }
-.hand-minute { stroke: var(--text); stroke-width: 4; stroke-linecap: round; }
-.hand-second { stroke: var(--primary); stroke-width: 2; stroke-linecap: round; }
+/* The Fix: Using CSS to perfectly position the clock numbers */
+.clock-number {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    /* Pushes the text to the top center of the circle */
+    padding-top: 10px; 
+}
 
 /* Responsive */
 @media (min-width: 768px) {
