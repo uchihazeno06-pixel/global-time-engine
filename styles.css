@@ -130,22 +130,43 @@ button:hover { background: var(--primary-hover); }
 .clock-layout { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px 0; }
 .date-display { font-size: 0.95rem; font-weight: 500; color: var(--text-muted); letter-spacing: 0.5px; }
 .digital-time { font-size: 1.75rem; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; letter-spacing: 1px; }
-.clock-svg { width: 100%; max-width: 240px; height: auto; }
 
-/* The Fix: Using CSS to perfectly position the clock numbers */
+/* The Clock Wrapper */
+.clock-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 240px;
+    height: 240px;
+    margin: 0 auto;
+}
+
+.clock-svg { width: 100%; height: 100%; }
+
+/* The Clock Numbers */
 .clock-number {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     text-align: center;
-    font-size: 1.1rem;
+    padding-top: 10px; /* Distance from the top edge */
+    font-size: 1.15rem;
     font-weight: 600;
     color: var(--text);
-    /* Pushes the text to the top center of the circle */
-    padding-top: 10px; 
+    pointer-events: none;
 }
 
-/* Responsive */
+.clock-number span {
+    display: inline-block;
+    /* We un-rotate the text inside the span so the numbers stay upright */
+}
+
+/* Clock Hands */
+.hand-hour { stroke: var(--text); stroke-width: 6; stroke-linecap: round; }
+.hand-minute { stroke: var(--text); stroke-width: 4; stroke-linecap: round; }
+.hand-second { stroke: var(--primary); stroke-width: 2; stroke-linecap: round; }
+
 @media (min-width: 768px) {
     .dashboard { grid-template-columns: 1fr 1fr; }
     .full-width { grid-column: span 2; }
