@@ -1,3 +1,4 @@
+// --- 1. INITIALIZATION ---
 const allTimezones = Intl.supportedValuesOf('timeZone');
 
 const selContinent = document.getElementById('selContinent');
@@ -13,7 +14,7 @@ let currentCountryStates = [];
 let activeTimezones = { local: Intl.DateTimeFormat().resolvedOptions().timeZone, global: null };
 let searchTimeout = null;
 
-// --- CLOCK FUNCTIONS ---
+// --- 2. CLOCK FUNCTIONS ---
 function generateTicks(svgGroupId) {
     const group = document.getElementById(svgGroupId);
     if (!group) return;
@@ -70,21 +71,20 @@ function updateAllClocks() {
     }
 }
 
-// --- DYNAMIC DROPDOWNS ---
+// --- 3. DYNAMIC DROPDOWNS (Bulletproof Fetch) ---
 async function loadGeoDatabase() {
     try {
-        // Use Netlify proxy if deployed, otherwise direct fetch for local testing
-        const endpoint = window.location.protocol === 'file:' 
-            ? 'https://cdn.jsdelivr.net/npm/geo-data-api@latest/dist/api/v1/countries.json'
-            : '/api/countries/countries.json';
-
-        const res = await fetch(endpoint);
+        // Using a reliable open-source database hosted on GitHub that allows direct browser fetching
+        const res = await fetch('https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/json/countries.json');
         const data = await res.json();
-        globalCountries = data.data;
+        
+        // Save the full list
+        globalCountries = data;
 
-        selContinent.innerHTML = '<option value="">Select Continent...</option>';
+        // Extract unique regions (continents)
         const continents = [...new Set(globalCountries.map(c => c.region))].filter(Boolean).sort();
         
+        selContinent.innerHTML = '<option value="">Select Continent...</option>';
         continents.forEach(continent => {
             let opt = document.createElement('option');
             opt.value = continent;
@@ -110,11 +110,13 @@ async function updateCountries() {
         return;
     }
 
+    // Filter the global list by the selected continent
     const filtered = globalCountries.filter(c => c.region === continent).sort((a, b) => a.name.localeCompare(b.name));
     
     filtered.forEach(country => {
         let opt = document.createElement('option');
-        opt.value = country.code;
+        // The database uses 'iso2' for country codes (e.g., NG, US)
+        opt.value = country.iso2; 
         opt.innerText = country.name;
         selCountry.appendChild(opt);
     });
@@ -129,13 +131,12 @@ async function updateStates() {
     if (!countryCode) return;
 
     try {
-        const endpoint = window.location.protocol === 'file:'
-            ? `https://cdn.jsdelivr.net/npm/geo-data-api@latest/dist/api/v1/states/country/${countryCode.toLowerCase()}.json`
-            : `/api/countries/states/country/${countryCode.toLowerCase()}.json`;
-
-        const res = await fetch(endpoint);
+        // Fetch the states file globally (it's about 3MB, but loads fast)
+        const res = await fetch('https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/json/states.json');
         const data = await res.json();
-        currentCountryStates = data.data;
+        
+        // Filter the states to only show the ones matching the selected country
+        currentCountryStates = data.filter(s => s.country_code === countryCode);
 
         selState.innerHTML = '<option value="">Select State...</option>';
         
@@ -151,11 +152,12 @@ async function updateStates() {
             selState.innerHTML = '<option value="">No states found</option>';
         }
     } catch (error) {
+        console.error("State error:", error);
         selState.innerHTML = '<option value="">Error loading states</option>';
     }
 }
 
-// --- SEARCH BAR ---
+// --- 4. SEARCH BAR ---
 searchInput.addEventListener('input', function() {
     const val = this.value.trim();
     document.getElementById('timeResult').style.display = 'none';
@@ -170,7 +172,6 @@ searchInput.addEventListener('input', function() {
     }
 
     searchTimeout = setTimeout(() => {
-        // Since we are keeping it zero-key for now, it searches standard timezones
         searchDropdown.style.display = 'block';
         const tzMatches = allTimezones.filter(tz => tz.toLowerCase().includes(val.toLowerCase())).slice(0, 10);
         
@@ -199,7 +200,7 @@ document.addEventListener('click', function(e) {
     if (e.target !== searchInput) searchDropdown.style.display = 'none';
 });
 
-// --- CALCULATORS ---
+// --- 5. CALCULATORS ---
 function calculateDifference() {
     const startVal = document.getElementById('startDate').value;
     const endVal = document.getElementById('endDate').value;
@@ -271,16 +272,12 @@ function convertBirthTime() {
         return;
     }
 
+    // Find timezone from state data
     let targetTz = "UTC";
     const stateData = currentCountryStates.find(s => s.name === stateName);
     
     if (stateData && stateData.timezone) {
         targetTz = stateData.timezone;
-    } else {
-        const countryData = globalCountries.find(c => c.code === countryCode);
-        if (countryData && countryData.timezones && countryData.timezones.length > 0) {
-            targetTz = countryData.timezones[0];
-        }
     }
 
     const displayName = stateName ? `${stateName}` : selCountry.options[selCountry.selectedIndex].text;
@@ -310,14 +307,14 @@ function convertBirthTime() {
     }
 }
 
-// --- INIT ---
+// --- 6. INIT ---
 document.addEventListener('DOMContentLoaded', () => {
     generateTicks('localTicks');
     generateTicks('globalTicks');
     setInterval(updateAllClocks, 1000);
     updateAllClocks();
 
-    loadGeoDatabase(); // This loads the real, dynamic database
+    loadGeoDatabase(); // Triggers the bulletproof fetch
     
     selContinent.addEventListener('change', updateCountries);
     selCountry.addEventListener('change', updateStates);
